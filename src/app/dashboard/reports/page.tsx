@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getReports, generateAIReport, deleteReport } from '@/services/reports';
 import { useAuth } from '@/providers/auth-provider';
 import { FileText, Trash2, Download, Loader2 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 export default function ReportsPage() {
   const queryClient = useQueryClient();
@@ -16,8 +17,8 @@ export default function ReportsPage() {
     enabled: !!businessId,
   });
 
-  const generateMutation = useMutation({ mutationFn: generateAIReport, onSuccess: () => queryClient.invalidateQueries({ queryKey: ['reports'] }) });
-  const deleteMutation = useMutation({ mutationFn: deleteReport, onSuccess: () => queryClient.invalidateQueries({ queryKey: ['reports'] }) });
+  const generateMutation = useMutation({ mutationFn: generateAIReport, onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['reports'] }); toast.success('AI report generated'); }, onError: (err: any) => toast.error(err?.response?.data?.message || 'Generation failed') });
+  const deleteMutation = useMutation({ mutationFn: deleteReport, onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['reports'] }); toast.success('Report deleted'); }, onError: (err: any) => toast.error(err?.response?.data?.message || 'Delete failed') });
 
   return (
     <div className="space-y-6">
@@ -62,8 +63,8 @@ export default function ReportsPage() {
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  <button onClick={() => alert('Download feature coming soon')} className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg"><Download className="h-4 w-4" /></button>
-                  <button onClick={() => { if (confirm('Delete this report?')) deleteMutation.mutate(report._id); }} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="h-4 w-4" /></button>
+                  <button onClick={() => toast.info('Download feature coming soon')} className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg"><Download className="h-4 w-4" /></button>
+                  <button onClick={() => { if (window.confirm('Delete this report?')) deleteMutation.mutate(report._id); }} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="h-4 w-4" /></button>
                 </div>
               </div>
               <div className="mt-3 text-sm text-slate-700">

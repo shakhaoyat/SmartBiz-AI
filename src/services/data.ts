@@ -5,9 +5,7 @@ export const uploadDataset = async (file: File, businessId: string) => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('businessId', businessId);
-  const { data } = await api.post('/data/upload', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  const { data } = await api.post('/data/upload', formData);
   return data;
 };
 

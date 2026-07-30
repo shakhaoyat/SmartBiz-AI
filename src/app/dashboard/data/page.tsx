@@ -6,6 +6,7 @@ import { getDatasets, uploadDataset, deleteDataset } from '@/services/data';
 import { getBusinesses } from '@/services/business';
 import { useAuth } from '@/providers/auth-provider';
 import { Upload, Trash2, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 export default function DataPage() {
   const { user } = useAuth();
@@ -22,11 +23,11 @@ export default function DataPage() {
 
   const uploadMutation = useMutation({
     mutationFn: ({ file, businessId }: { file: File; businessId: string }) => uploadDataset(file, businessId),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['datasets'] }); setUploading(false); },
-    onError: () => setUploading(false),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['datasets'] }); setUploading(false); toast.success('Dataset uploaded successfully'); },
+    onError: (err: any) => { setUploading(false); toast.error(err?.response?.data?.message || 'Upload failed'); },
   });
 
-  const deleteMutation = useMutation({ mutationFn: deleteDataset, onSuccess: () => queryClient.invalidateQueries({ queryKey: ['datasets'] }) });
+  const deleteMutation = useMutation({ mutationFn: deleteDataset, onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['datasets'] }); toast.success('Dataset deleted'); }, onError: (err: any) => toast.error(err?.response?.data?.message || 'Delete failed') });
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
