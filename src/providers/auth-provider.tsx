@@ -29,7 +29,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = Cookies.get('token');
     const userData = Cookies.get('user');
     if (token && userData) {
-      setUser(JSON.parse(userData));
+      try {
+        setUser(JSON.parse(userData));
+      } catch {
+        Cookies.remove('token');
+        Cookies.remove('user');
+      }
     }
     setLoading(false);
   }, []);
